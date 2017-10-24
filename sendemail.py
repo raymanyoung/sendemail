@@ -10,9 +10,10 @@ textfile = 'content.txt'
 subjectfile = 'subject.txt'
 emailfile = 'lists/list.txt'
 accountfile = 'accounts/account.txt'
-interval = 20 
+interval = 20 # interval in seconds between 2 sendings
 smtp = ''
 port = 0
+emailNumberToReconnect = 10 # number of emails sent before next reconnect to server (the connection could timeout)
 
 
 # Open a plain text file for reading.  For this example, assume that
@@ -32,28 +33,18 @@ password = f.readline().strip()
 smtp = f.readline().strip()
 port = int(f.readline().strip())
 sender = f.readline().strip()
-	
+f.close()
+
 print(me, password, smtp, port)
 
 with open(emailfile, 'rb') as f:
     emails = f.readlines()
-# you may also want to remove whitespace characters like `\n` at the end of each line
 emails = [x.strip() for x in emails] 
-
-#msg = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n"
-#       % (me, to, subject))
-
-#msg = msg + c
-#print('msg: ' + msg)
-
-
-username= me
 
 i = 0
 
 with open('sent', 'a') as sentRecord:
 	with open('invalid', 'a') as invalidRecord:
-
 		for add in emails :
 			if i ==  0 :
 				print("establishing new connection...")
@@ -61,10 +52,10 @@ with open('sent', 'a') as sentRecord:
 
 				s.starttls()
 				print("connection established, logging in")
-				s.login(username, password)
+				s.login(me, password)
 
 			i = i + 1
-			if i > 10 :
+			if i > emailNumberToReconnect :
 				i = 0
 
 			msg = MIMEText(c, "plain", 'utf-8')
