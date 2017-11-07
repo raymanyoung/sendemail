@@ -9,11 +9,11 @@ from email.mime.text import MIMEText
 textfile = 'content.txt'
 subjectfile = 'subject.txt'
 emailfile = 'lists/list.txt'
-accountfile = 'accounts/account.txt'
-interval = 20 # interval in seconds between 2 sendings
+accountfile = 'accounts/japaccount.txt'
+interval = 60 #interval in seconds between 2 sendings
 smtp = ''
 port = 0
-emailNumberToReconnect = 10 # number of emails sent before next reconnect to server (the connection could timeout)
+emailNumberToReconnect = 8   # number of emails sent before next reconnect to server (the connection could timeout)
 
 
 # Open a plain text file for reading.  For this example, assume that
@@ -68,12 +68,15 @@ with open('sent', 'a') as sentRecord:
 			print('sending email to ' + add)
 			try:
 				s.sendmail(me, [add], msg.as_string())
-				print('sent. Waiting...')
-				sentRecord.write(add)
+				print('sent. Waiting...i')
+				sentRecord.write(add + "\r\n")
 			except smtplib.SMTPRecipientsRefused as e:
-				print("invalid address " + add)
+				print("invalid address " + add )
 				print(e.recipients)
-				invalidRecord.write(add)
+				invalidRecord.write(add + "\r\n")
+                        #except smtplib.SMTPDataError as e:
+                        #        print("SMTPDataError: invalid address " + add)
+                        #        invalidRecord.write(add)
 
 			time.sleep(interval)
 		s.quit()
