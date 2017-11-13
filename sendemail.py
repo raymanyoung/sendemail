@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 textfile = 'content.txt'
 subjectfile = 'subject.txt'
 emailfile = 'lists/list.txt'
-accountfile = 'accounts/japaccount.txt'
+accountfile = 'accounts/account.txt'
 interval = 60 #interval in seconds between 2 sendings
 smtp = ''
 port = 0
@@ -20,7 +20,7 @@ emailNumberToReconnect = 8   # number of emails sent before next reconnect to se
 # the text file contains only ASCII characters.
 file = codecs.open(textfile, 'r', encoding='utf-8')
 # Create a text/plain message
-c = file.read()
+content = file.read()
 file.close()
 
 sf = codecs.open(subjectfile, 'r', encoding = 'utf-8')
@@ -44,40 +44,40 @@ emails = [x.strip() for x in emails]
 i = 0
 
 with open('sent', 'a') as sentRecord:
-	with open('invalid', 'a') as invalidRecord:
-		for add in emails :
-			if i ==  0 :
-				print("establishing new connection...")
-				s = smtplib.SMTP(smtp, port)
+    with open('invalid', 'a') as invalidRecord:
+        for add in emails :
+            if i ==  0 :
+                print("establishing new connection...")
+                s = smtplib.SMTP(smtp, port)
 
-				s.starttls()
-				print("connection established, logging in")
-				s.login(me, password)
+                s.starttls()
+                print("connection established, logging in")
+                s.login(me, password)
 
-			i = i + 1
-			if i > emailNumberToReconnect :
-				i = 0
+            i = i + 1
+            if i > emailNumberToReconnect :
+                i = 0
 
-			msg = MIMEText(c, "plain", 'utf-8')
-			msg['Subject'] = subject
-			msg['From'] = sender + ' <' + me + '>'
-			msg['To'] = add
-			
-			# Send the message via our own SMTP server, but don't include the
-			# envelope header.
-			print('sending email to ' + add)
-			try:
-				s.sendmail(me, [add], msg.as_string())
-				print('sent. Waiting...i')
-				sentRecord.write(add + "\r\n")
-			except smtplib.SMTPRecipientsRefused as e:
-				print("invalid address " + add )
-				print(e.recipients)
-				invalidRecord.write(add + "\r\n")
-                        #except smtplib.SMTPDataError as e:
-                        #        print("SMTPDataError: invalid address " + add)
-                        #        invalidRecord.write(add)
+            msg = MIMEText(content, "plain", 'utf-8')
+            msg['Subject'] = subject
+            msg['From'] = sender + ' <' + me + '>'
+            msg['To'] = add
+            
+            # Send the message via our own SMTP server, but don't include the
+            # envelope header.
+            print('sending email to ' + add)
+            try:
+                s.sendmail(me, [add], msg.as_string())
+                print('sent. Waiting...i')
+                sentRecord.write(add + "\r\n")
+            except smtplib.SMTPRecipientsRefused as e:
+                print("invalid address " + add )
+                print(e.recipients)
+                invalidRecord.write(add + "\r\n")
+            #except smtplib.SMTPDataError as e:
+            #   print("SMTPDataError: invalid address " + add)
+            #   invalidRecord.write(add)
 
-			time.sleep(interval)
-		s.quit()
-	
+            time.sleep(interval)
+        s.quit()
+    
